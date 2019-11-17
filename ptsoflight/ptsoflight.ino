@@ -6,6 +6,9 @@ CRGB leds[NUM_STRIPS][NUM_LEDS];
 struct Point {
   int val = 0;
   int direction = 1;
+  int life = 0;
+  int lifespan = 150;
+  Point *next;
 };
 
 struct Point *pointHead = 0;
@@ -22,26 +25,28 @@ void setup() {
   pointHead = new Point();
 }
 
-void loop() {
-  if (pointHead->val >= NUM_LEDS) {
-    pointHead->direction = -1;
-  } else if (pointHead->val <= 0) {
-    pointHead->direction = 1;
-  }
+void loop()
+{
+  updatePoints();
 
-  pointHead->val += pointHead->direction;
+  for (int s = 0; s < NUM_STRIPS; s++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      Point *ptr = pointHead;
+      bool set = false;
+      do {
+        if (i == ptr->val) {
+          set = true;
+        }
+        ptr = ptr->next;
+      } while (ptr);
 
-  for (int s=0; s<NUM_STRIPS; s++) {
-    for (int i=0; i<NUM_LEDS; i++) {
-      if (i == pointHead->val) {
-        double b = 127 * (1 + sin((i * 0.2) + (millis() * 0.00042 * (s+1))));
-        double g = 127 * (1 + sin((i * 0.2) + (millis() * 0.00036 * (s+1))));
-  //      Serial.println(g);
+      if (set) {
+                double b = 127 * (1 + sin((i * 0.2) + (millis() * 0.00042 * (s + 1))));
+        double g = 127 * (1 + sin((i * 0.2) + (millis() * 0.00036 * (s + 1))));
         leds[s][i] = CRGB(
-          0,
-          g,
-          b
-        );
+            0,
+            g,
+            b);
       } else {
         leds[s][i] = CRGB(0, 0, 0);
       }
@@ -49,5 +54,62 @@ void loop() {
   }
 
   FastLED.show();
-  delay(40);
+  delay(60);
+}
+
+void updatePoints()
+{
+  Point *ptr = pointHead;
+  Point *prev = 0;
+
+  if ((random() % 10) == 0) {
+    Point *newPt = new Point();
+    newPt->lifespan = 20 + random() % 10;
+    newPt->val = random() % NUM_LEDS;
+    newPt->direction = 1;
+    append(pointHead, newPt);
+  }
+
+  do
+  {
+    ptr->val += ptr->direction;
+
+    if (ptr->val >= NUM_LEDS) {
+      ptr->direction = -1;
+    } else if (ptr->val <= 0) {
+      ptr->direction = 1;
+    }
+
+    if (ptr->life++ >= ptr->lifespan) {
+      if (prev == 0) { // this is the head
+        if (ptr == pointHead) {
+          Point *newHead = pointHead->next;
+          if (newHead) {
+            delete pointHead;
+            pointHead = newHead;
+            ptr = pointHead;
+          }
+        }
+      } else {
+        prev->next = ptr->next;
+        delete ptr;
+        ptr = prev->next;
+      }
+    }
+
+    if (!ptr) {
+      break;
+    }
+
+    prev = ptr;
+    ptr = ptr->next;
+  } while (ptr);
+}
+
+void append(Point *head, Point *item) {
+  while (head->next) {
+    head = head->next;
+  }
+
+  head->next = item;
 }
