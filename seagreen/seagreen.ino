@@ -16,8 +16,8 @@ void setup() {
 void loop() {
   for (int s=0; s<NUM_STRIPS; s++) {
     for (int i=0; i<NUM_LEDS; i++) {
-      double b = 127 * (1 + sin((i * 0.2) + (millis() * 0.0042 * (s+1))));
-      double g = 127 * (1 + sin((i * 0.2) + (millis() * 0.0036 * (s+1))));
+      double b = 127 * (1 + sin((i * 0.2) + (millis() * 0.00042 * (s+1))));
+      double g = 127 * (1 + sin((i * 0.2) + (millis() * 0.00036 * (s+1))));
 //      Serial.println(g);
       leds[s][i] = CRGB(
         0,
