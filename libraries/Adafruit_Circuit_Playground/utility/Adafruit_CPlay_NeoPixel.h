@@ -1,6 +1,4 @@
 /*!
- * @file Adafruit_NeoPixel.h
- *
  * This is part of Adafruit's NeoPixel library for the Arduino platform,
  * allowing a broad range of microcontroller boards (most AVR boards,
  * many ARM devices, ESP8266 and ESP32, among others) to control Adafruit
@@ -33,8 +31,8 @@
  *
  */
 
-#ifndef ADAFRUIT_NEOPIXEL_H
-#define ADAFRUIT_NEOPIXEL_H
+#ifndef ADAFRUIT_CPLAY_NEOPIXEL_H
+#define ADAFRUIT_CPLAY_NEOPIXEL_H
 
 #ifdef ARDUINO
   #if (ARDUINO >= 100)
@@ -148,6 +146,8 @@ for x in range(256):
     print("{:3},".format(int((math.sin(x/128.0*math.pi)+1.0)*127.5+0.5))),
     if x&15 == 15: print
 */
+
+#if !defined(ADAFRUIT_NEOPIXEL_H)
 static const uint8_t PROGMEM _NeoPixelSineTable[256] = {
   128,131,134,137,140,143,146,149,152,155,158,162,165,167,170,173,
   176,179,182,185,188,190,193,196,198,201,203,206,208,211,213,215,
@@ -191,20 +191,21 @@ static const uint8_t PROGMEM _NeoPixelGammaTable[256] = {
   150,152,154,156,158,160,162,164,166,168,170,172,174,176,178,180,
   182,184,186,188,191,193,195,197,199,202,204,206,209,211,213,215,
   218,220,223,225,227,230,232,235,237,240,242,245,247,250,252,255};
+#endif
 
 /*! 
     @brief  Class that stores state and functions for interacting with
             Adafruit NeoPixels and compatible devices.
 */
-class Adafruit_NeoPixel {
+class Adafruit_CPlay_NeoPixel {
 
  public:
 
   // Constructor: number of LEDs, pin number, LED type
-  Adafruit_NeoPixel(uint16_t n, uint16_t pin=6,
+  Adafruit_CPlay_NeoPixel(uint16_t n, uint16_t pin=6,
     neoPixelType type=NEO_GRB + NEO_KHZ800);
-  Adafruit_NeoPixel(void);
-  ~Adafruit_NeoPixel();
+  Adafruit_CPlay_NeoPixel(void);
+  ~Adafruit_CPlay_NeoPixel();
 
   void              begin(void);
   void              show(void);
@@ -231,7 +232,7 @@ class Adafruit_NeoPixel {
     @return  1 or true if show() will start sending immediately, 0 or false
              if show() would block (meaning some idle time is available).
   */
-  bool           canShow(void) const { return (micros()-endTime) >= 300L; }
+  boolean           canShow(void) const { return (micros()-endTime) >= 300L; }
   /*!
     @brief   Get a pointer directly to the NeoPixel data buffer in RAM.
              Pixel data is stored in a device-native format (a la the NEO_*
@@ -335,9 +336,9 @@ class Adafruit_NeoPixel {
  protected:
 
 #ifdef NEO_KHZ400  // If 400 KHz NeoPixel support enabled...
-  bool              is800KHz;   ///< true if 800 KHz pixels
+  boolean           is800KHz;   ///< true if 800 KHz pixels
 #endif
-  bool              begun;      ///< true if begin() previously called
+  boolean           begun;      ///< true if begin() previously called
   uint16_t          numLEDs;    ///< Number of RGB LEDs in strip
   uint16_t          numBytes;   ///< Size of 'pixels' buffer below
   int16_t           pin;        ///< Output pin number (-1 if not yet set)
@@ -352,7 +353,7 @@ class Adafruit_NeoPixel {
   volatile uint8_t *port;       ///< Output PORT register
   uint8_t           pinMask;    ///< Output PORT bitmask
 #endif
-#if defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_ARDUINO_CORE_STM32)
+#ifdef ARDUINO_ARCH_STM32
   GPIO_TypeDef *gpioPort;       ///< Output GPIO PORT
   uint32_t gpioPin;             ///< Output GPIO PIN
 #endif
