@@ -1,30 +1,34 @@
 #include "FastLED.h"
+
 #define NUM_LEDS 75
-#define NUM_STRIPS 5
-CRGB leds[NUM_STRIPS][NUM_LEDS];
+
+// range 0-255
+#define BRIGHTNESS 64
+
+CRGB leds[NUM_LEDS];
+
 void setup() {
-  FastLED.addLeds<NEOPIXEL, 0>(leds[0], NUM_LEDS);
-  FastLED.addLeds<NEOPIXEL, 1>(leds[1], NUM_LEDS);
-  FastLED.addLeds<NEOPIXEL, 2>(leds[2], NUM_LEDS);
-//  FastLED.addLeds<NEOPIXEL, 3>(leds, NUM_LEDS); // not working
-//  FastLED.addLeds<NEOPIXEL, 4>(leds, NUM_LEDS); // not working
-  FastLED.addLeds<NEOPIXEL, 5>(leds[3], NUM_LEDS);
-  FastLED.addLeds<NEOPIXEL, 6>(leds[4], NUM_LEDS);
+  // save memory by reusing the same data on all strips
+  FastLED.addLeds<NEOPIXEL, 0>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 1>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 2>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 3>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 4>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 5>(leds, NUM_LEDS);
+  FastLED.addLeds<NEOPIXEL, 6>(leds, NUM_LEDS);
 //  Serial.begin(9600);
 }
 
 void loop() {
-  for (int s=0; s<NUM_STRIPS; s++) {
-    for (int i=0; i<NUM_LEDS; i++) {
-      double b = 127 * (1 + sin((i * 0.2) + (millis() * 0.00042 * (s+1))));
-      double g = 127 * (1 + sin((i * 0.2) + (millis() * 0.00036 * (s+1))));
+  for (int i=0; i<NUM_LEDS; i++) {
+    double b = BRIGHTNESS * (1 + sin((i * 0.2) + (millis() * 0.00042)));
+    double g = BRIGHTNESS * (1 + sin((i * 0.2) + (millis() * 0.00036)));
 //      Serial.println(g);
-      leds[s][i] = CRGB(
-        0,
-        g,
-        b
-      );
-    }
+    leds[i] = CRGB(
+      0,
+      g,
+      b
+    );
   }
 
   FastLED.show();
