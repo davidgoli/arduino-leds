@@ -3,7 +3,7 @@
 #define NUM_LEDS 75
 
 // range 0-255
-#define BRIGHTNESS 64
+#define BRIGHTNESS 32
 
 CRGB leds[NUM_LEDS];
 
@@ -25,8 +25,8 @@ void loop() {
     double g = BRIGHTNESS * (1 + sin((i * 0.2) + (millis() * 0.00036)));
 //      Serial.println(g);
     leds[i] = CRGB(
-      0,
       g,
+      0,
       b
     );
   }

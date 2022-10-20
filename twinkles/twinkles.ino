@@ -15,7 +15,7 @@ struct Twinkle {
   int ledNum;
 };
 
-#define NUM_TWINKLES 30
+#define NUM_TWINKLES 20
 
 struct Twinkle twinkles[NUM_TWINKLES];
 
@@ -44,11 +44,29 @@ void loop() {
     leds[i] = CRGB::Black;
   }
 
+  twinkly(max(0, sin(millis() / 60000)+1));
+  bisexual(max(0, sin(10000 + (millis() / 60000))));
+  seagreen(max(0, sin(20000 + (millis() / 60000))));
+
+  FastLED.show();
+//  delay(10);
+}
+
+void initializeTwinkle(Twinkle twinkles[], int i) {
+  twinkles[i].duration = random(2000, 10000);
+  do {
+    twinkles[i].ledNum = random(0, NUM_LEDS);
+  } while (leds[twinkles[i].ledNum]);
+  twinkles[i].intensity = random(BRIGHTNESS / 2, BRIGHTNESS);
+  twinkles[i].startTime = millis();
+  twinkles[i].darkInterval = random(0, 1000);
+}
+
+void twinkly(float factor) {
   for (int i=0; i<NUM_TWINKLES; i++) {
     Twinkle twinkle = twinkles[i];
     float maxAge = twinkle.startTime + twinkle.duration + twinkle.darkInterval;
     if (millis() >= maxAge) {
-      Serial.println("reinitializing");
       initializeTwinkle(twinkles, i);
     }
     float age = millis() - twinkle.startTime;
@@ -56,19 +74,32 @@ void loop() {
     float maxPt = twinkle.duration * 0.5;
     float b = max(0, (1.0 - (abs(age - maxPt) / maxPt)) * (float)twinkle.intensity);
 
-    leds[twinkle.ledNum] = CHSV(0, 0, b);
+    leds[twinkle.ledNum] += CHSV(0, 0, b * factor);
   }
-
-  FastLED.show();
-//  delay(10);
 }
 
-void initializeTwinkle(Twinkle twinkles[], int i) {
-  twinkles[i].duration = random(1000, 8000);
-  do {
-    twinkles[i].ledNum = random(0, NUM_LEDS);
-  } while (leds[twinkles[i].ledNum]);
-  twinkles[i].intensity = random(BRIGHTNESS / 2, BRIGHTNESS);
-  twinkles[i].startTime = millis();
-  twinkles[i].darkInterval = random(0, 1000);
+void bisexual(float factor) {
+  for (int i=0; i<NUM_LEDS; i++) {
+    double b = 32 * (1 + sin((i * 0.2) + (millis() * 0.00042)));
+    double g = 32 * (1 + sin((i * 0.2) + (millis() * 0.00036)));
+  //      Serial.println(g);
+    leds[i] += CRGB(
+      g * factor,
+      0,
+      b * factor
+    );
+  }
+}
+
+void seagreen(float factor) {
+  for (int i=0; i<NUM_LEDS; i++) {
+    double b = 32 * (1 + sin((i * 0.2) + (millis() * 0.00042)));
+    double g = 32 * (1 + sin((i * 0.2) + (millis() * 0.00036)));
+  //      Serial.println(g);
+    leds[i] += CRGB(
+      0,
+      g * factor,
+      b * factor
+    );
+  }
 }
